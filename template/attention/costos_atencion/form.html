@@ -1,0 +1,334 @@
+{% extends "components/base.html" %}
+{% load static %}
+{% block css %}
+<style>
+    .form-floating > label {
+        padding: 0.5rem 0.75rem;
+    }
+    .form-floating > .form-control,
+    .form-floating > .form-select {
+        height: 3.5rem;
+        line-height: 1.25;
+    }
+    .form-floating > textarea.form-control {
+        height: auto;
+        min-height: 100px;
+    }
+    .card {
+        border-radius: 15px;
+        border: none;
+    }
+    .section-title {
+        color: #2563eb;
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    .btn-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        padding: 0.625rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    .btn-primary:hover {
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<title>{% block title %}Registrar Atención Médica{% endblock title %}</title>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xxl-10">
+            <h3 class="text-center mb-2 fw-bold text-primary-emphasis shadow">
+                {{ title1 }} Médica
+            </h3>
+
+            <div class="card shadow">
+                <div class="card-body p-2 p-md-3">
+                    <form id="frmAtencion" method="POST">
+                        {% csrf_token %}
+                        {{ form.media }}
+                        
+                        <!-- Información del Costo de Atención -->
+                        <h5 class="text-primary-emphasis fw-bold">Información del Costo de Atención</h5>
+                        <hr class="border border-2 border-success">
+                        <div class="row g-4 mb-2">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.atencion }}
+                                    <label for="{{ form.atencion.id_for_label }}">{{ form.atencion.label }}</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    {{ form.total }}
+                                    <label for="{{ form.total.id_for_label }}">{{ form.total.label }}</label>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <!-- Información de Servicios Adicionales -->
+                        <h5 class="text-primary-emphasis fw-bold">Servicios Adicionales</h5>
+                        <hr class="border border-3 border-danger fw-bold">
+                        <div class="row g-3 mb-2">
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <select class="form-select" id="servicios_adicionalesSelect">
+                                        <option value="" selected>Seleccione un servicio</option>
+                                        {% for item in servicios_adicionales %}
+                                            <option 
+                                                data-id="{{ item.id }}" 
+                                                data-des="{{ item.nombre_servicio }}" 
+                                                data-costo="{{ item.costo_servicio }}" 
+                                                value="{{ item.id }}" 
+                                            >
+                                                {{ item.nombre_servicio }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>                                  
+                                    <label for="servicios_adicionalesSelect" class="form-label">Servicios</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-floating mt-2 ms-2">
+                                    <button type="button" class="btn btn-outline-success fw-bold w-100" onclick="addServicioAdicional()">
+                                        Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="border border-3 border-danger">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="serviciosTable">
+                                <thead>
+                                    <tr>
+                                        <th class="text-warning">Código</th>
+                                        <th class="text-success">Servicio</th>
+                                        <th class="text-primary">Cantidad</th>
+                                        <th class="text-danger-emphasis fw-bold">Costo</th>
+                                        <th class="text-danger">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                        <div class="d-flex justify-content-end mt-4 gap-2">
+                            <button type="button" onclick="costoAtencion.saveCostos()" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Guardar
+                            </button>
+                            <a class="btn btn-success" href="{% url 'attention:costos_list' %}">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+<div class="col-md-3">
+    <div class="form-floating">
+        {{ form.total }}
+        <label for="{{ form.total.id_for_label }}">{{ form.total.label }}</label>
+    </div>
+</div>
+
+{% block js %}
+<script>
+    class CostoAtencion {
+        constructor(detalleUpdate) {
+            this.atencion = '';   // Costo de la atención
+            this.total = 0;       // Total acumulado
+            this.servicios = [];  // Lista de servicios agregados
+            console.log('Detalle Costo Atencion Inicializado');
+
+                // Supongamos que `detalleUpdate` es el arreglo de detalles que se recibe del backend.
+                // Este script se ejecutará cuando se reciba la respuesta del backend con los detalles de los costos y servicios.
+            if (detalleUpdate && detalleUpdate.length > 0) {
+                // Limpiamos la lista de servicios anteriores si es necesario
+                this.servicios = [];
+
+                // Recorremos los detalles que recibimos
+                detalleUpdate.forEach(det => {
+                    // Extraemos los datos necesarios de cada detalle
+                    let codigo = det.servicios_adicionales_id; // Código del servicio adicional
+                    let nombre = det.servicios_adicionales__nombre_servicio; // Nombre del servicio adicional
+                    let costo_servicio = det.costos_servicio; // Costo del servicio adicional
+
+                    // Mostramos los datos para depuración (puedes eliminar esto si ya no lo necesitas)
+                    console.log(codigo, nombre, costo_servicio);
+
+                    // Agregamos el servicio al arreglo de servicios que manejamos en el frontend
+                    this.servicios.push({ codigo, nombre, costo_servicio });
+                });
+
+                // Sincronizamos la tabla o lo que sea necesario en el frontend
+                this.syncTable();
+            }
+
+        }
+
+        // Método para agregar un servicio
+        addServicio(codigo, costo_servicio) {
+            const servicioExistente = this.servicios.findIndex(serv => serv.codigo === codigo);
+            if (servicioExistente >= 0) {
+                alert('Este servicio ya está agregado. Actualizando cantidad.');
+                this.servicios[servicioExistente].cantidad += 1;  // Actualiza la cantidad del servicio
+            } else {
+                // Agregar nuevo servicio con cantidad 1
+                this.servicios.push({ codigo, costo_servicio, cantidad: 1 });
+            }
+            this.syncTable();
+        }
+
+        // Método para eliminar un servicio
+        removeServicio(codigo) {
+            this.servicios = this.servicios.filter(serv => serv.codigo !== codigo);
+            this.syncTable();
+        }
+
+        // Método para sincronizar los servicios con la tabla y actualizar el total
+        syncTable() {
+            const tableBody = document.querySelector('#serviciosTable tbody');
+            tableBody.innerHTML = '';  // Limpiar la tabla
+            let totalCosto = 0;  // Variable para calcular el total de los servicios
+
+            // Recorrer los servicios y agregarlos a la tabla
+            this.servicios.forEach((serv) => {
+                totalCosto += serv.costo_servicio * serv.cantidad;  // Sumar el costo total de cada servicio
+                const row = `
+                    <tr>
+                        <td>${serv.codigo}</td>
+                        <td>${serv.costo_servicio}</td>
+                        <td>${serv.cantidad}</td>
+                        <td>${(serv.costo_servicio * serv.cantidad).toFixed(2)}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="costoAtencion.removeServicio('${serv.codigo}')">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </td>
+                    </tr>`;
+                tableBody.innerHTML += row;
+            });
+
+            // Mostrar el total de los servicios
+            const totalRow = `<tr><td colspan="3" class="text-end"><strong>Total Servicios</strong></td><td>${totalCosto.toFixed(2)}</td></tr>`;
+            tableBody.innerHTML += totalRow;
+
+            // Actualizar el total del formulario
+            this.updateTotal(totalCosto);
+        }
+
+        // Actualizar el total combinado (atención + servicios) en el formulario
+        updateTotal(totalServicios) {
+            const totalAtencion = parseFloat(this.atencion) || 0;  // Si no hay atención, se toma 0
+            const totalCombinado = totalAtencion + totalServicios;  // Total final
+
+            // Actualizar el campo de total con el valor calculado
+            const totalField = document.querySelector('#id_total');
+            if (!totalField.disabled) {
+                totalField.value = totalCombinado.toFixed(2);  // Actualiza el valor del campo total
+            }
+        }
+
+        // Método para guardar los costos y servicios
+        saveCostos() {
+            this.atencion = document.querySelector('#id_atencion').value;
+            this.total = document.querySelector('#id_total').value;
+
+            if (!this.atencion || !this.total) {
+                alert('Por favor, complete todos los campos obligatorios.');
+                return;
+            }
+
+            // Verificar si existen servicios agregados
+            if (this.servicios.length === 0) {
+                alert('Por favor, agregue al menos un servicio.');
+                return;
+            }
+
+            // Crear el objeto con los datos para enviar al backend
+            const data = {
+                atencion: this.atencion,
+                total: this.total,
+                servicios: this.servicios,
+            };
+
+            // Enviar los datos al backend con fetch()
+            let url = window.location.pathname.trim();
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.msg);
+                window.location.href = '/costos_list/';
+            })
+            .catch(error => {
+                console.error('Error al guardar el costo:', error);
+            });
+        }
+    }
+
+    // Instanciar la clase
+    let detailCostosUpdate = JSON.parse('{{ detail_costos|safe }}');
+
+    const costoAtencion = new CostoAtencion();
+
+    // Función para agregar un servicio adicional
+    function addServicioAdicional() {
+        const servicioSelect = document.querySelector('#servicios_adicionalesSelect');
+        const selectedOption = servicioSelect.selectedOptions[0];
+        const servicioId = selectedOption.value;
+        const costoServicio = parseFloat(selectedOption.getAttribute('data-costo'));
+
+        if (servicioId === "") {
+            alert('Por favor, seleccione un servicio.');
+            return;
+        }
+
+        costoAtencion.addServicio(servicioId, costoServicio);  // Agregar servicio
+        servicioSelect.selectedIndex = 0;  // Limpiar selección
+    }
+
+    // Bloquear el campo total al presionar Enter
+    document.querySelector('#frmAtencion').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            document.querySelector('#id_total').disabled = true;  // Bloquear campo total
+            alert('El campo de total ha sido bloqueado.');
+        }
+    });
+
+    // Actualizar el total cuando se seleccione un servicio
+    document.querySelector('#servicios_adicionalesSelect').addEventListener('change', function() {
+        costoAtencion.syncTable();  // Actualizar la tabla y el total
+    });
+</script>
+{% endblock %}
+
+
+
+
+

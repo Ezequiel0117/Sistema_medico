@@ -1,0 +1,59 @@
+{% extends "components/base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1>Listado de Exámenes</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Nombre del Examen</th>
+                <th scope="col">Paciente</th>
+                <th scope="col">Fecha de Solicitud</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for solicitado in solicitados1 %}
+                <tr>
+                    <td>{{ solicitado.nombre_examen }}</td>
+                    <td>{{ solicitado.paciente }}</td>
+                    <td>{{ solicitado.fecha_solicitud }}</td>
+                    <td>{{ solicitado.estado }}</td>
+                    <td>
+                        <a href="{% url 'core:ExamenSolicitado_detail' solicitado.pk %}" class="btn btn-info btn-sm">Ver</a>
+                        <a href="{% url 'core:ExamenSolicitado_edit' solicitado.pk %}" class="btn btn-warning btn-sm">Editar</a>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ solicitado.pk }}">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+                <div class="modal fade" id="confirmDeleteModal{{ solicitado.pk }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>¿Estás seguro de que deseas eliminar Esta Solicitud?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <form method="post" action="{% url 'core:ExamenSolicitado_delete' solicitado.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </form>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay exámenes solicitados disponibles</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'core:ExamenSolicitado_create' %}" class="btn btn-primary mt-3">Agregar Examen Solicitado</a>
+</div>
+{% endblock %}

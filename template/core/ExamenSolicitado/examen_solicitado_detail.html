@@ -1,0 +1,33 @@
+{% extends "components/base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h1>Detalle del Examen Solicitado</h1>
+    <table class="table table-bordered">
+        <tr>
+            <th>Nombre del Examen</th>
+            <td>{{ solicitado.nombre_examen }}</td>
+        </tr>
+        <tr>
+            <th>Paciente</th>
+            <td>{{ solicitado.paciente }}</td>
+        </tr>
+        <tr>
+            <th>Fecha de Solicitud</th>
+            <td>{{ solicitado.fecha_solicitud }}</td>
+        </tr>
+        <tr>
+            <th>Resultado</th>
+            <td>{{ solicitado.resultado }}</td>
+        </tr>
+        <tr>
+            <th>Comentario</th>
+            <td>{{ solicitado.comentario }}</td>
+        </tr>
+        <tr>
+            <th>Estado</th>
+            <td>{{ solicitado.estado }}</td>
+        </tr>
+    </table>
+    <a href="{% url 'core:ExamenSolicitado_list' %}" class="btn btn-secondary">Volver a la lista</a>
+</div>
+{% endblock %}

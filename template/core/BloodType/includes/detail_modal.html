@@ -1,0 +1,44 @@
+<!-- templates/includes/patient_detail_modal.html -->
+<div class="modal fade" id="tipoModal" tabindex="-1" aria-labelledby="tipoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Encabezado del Modal -->
+            <div class="modal-header bg-primary bg-opacity-75">
+                <h5 class="modal-title text-white fw-bold" id="tipoModalLabel">
+                    <i class="fas fa-tint me-2"></i>Detalles del Tipo de Sangre
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Cuerpo del Modal -->
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <!-- Columna de Información -->
+                        <div class="col-md-12">
+                            <div class="row mb-3">
+                                <div class="col-md-4 d-flex align-items-center">
+                                    <i class="fas fa-id-card fa-lg text-primary me-2"></i>
+                                    <p class="mb-0"><strong>ID:</strong> <span id="tipo-id"></span></p>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-center">
+                                    <i class="fas fa-vial fa-lg text-danger me-2"></i>
+                                    <p class="mb-0"><strong>Tipo:</strong> <span id="tipo-tipo"></span></p>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-center">
+                                    <i class="fas fa-info-circle fa-lg text-info me-2"></i>
+                                    <p class="mb-0"><strong>Descripción:</strong> <span id="tipo-descripcion"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Pie del Modal -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

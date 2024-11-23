@@ -1,0 +1,42 @@
+syncTable() {
+    const tableBody = document.querySelector('#serviciosTable tbody');
+    tableBody.innerHTML = '';
+    let totalCosto = 0;
+
+    this.servicios.forEach((serv) => {
+        totalCosto += (serv.cantidad * serv.costo);
+        const row = `
+            <tr>
+                <td>${serv.codigo}</td>
+                <td>${serv.descripcion}</td>
+                <td>${serv.cantidad}</td>
+                <td>${serv.costo}</td>
+                <td>
+                    <button class="btn btn-danger" onclick="costoAtencion.removeServicio('${serv.codigo}')">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </td>
+            </tr>`;
+        tableBody.innerHTML += row;
+    });
+
+    // Mostrar el total
+    const totalRow = `<tr><td colspan="3" class="text-end"><strong>Total</strong></td><td colspan="2">${totalCosto}</td></tr>`;
+    tableBody.innerHTML += totalRow;
+}
+
+addServicio(codigo, descripcion, cantidad, costo) {
+    const servicioExistente = this.servicios.findIndex(serv => serv.codigo === codigo);
+    if (servicioExistente >= 0) {
+        alert('Este servicio ya está agregado. Actualizando cantidad.');
+        this.servicios[servicioExistente].cantidad += cantidad;
+    } else {
+        this.servicios.push({ codigo, descripcion, cantidad, costo });
+    }
+    this.syncTable();
+}
+
+removeServicio(codigo) {
+    this.servicios = this.servicios.filter(serv => serv.codigo !== codigo);
+    this.syncTable();
+}

@@ -1,0 +1,38 @@
+{% extends "components/base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Agregar Examen Solicitado</h1>
+
+    <form method="post" class="bg-light p-4 rounded shadow">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="{{ form.nombre_examen.id_for_label }}" class="form-label">Nombre del Examen</label>
+            {{ form.nombre_examen }}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.paciente.id_for_label }}" class="form-label">Paciente</label>
+            {{ form.paciente }}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.resultado.id_for_label }}" class="form-label">Resultado</label>
+            {{ form.resultado }}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.comentario.id_for_label }}" class="form-label">Comentario</label>
+            {{ form.comentario }}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.estado.id_for_label }}" class="form-label">Estado</label>
+            {{ form.estado }}
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 mb-2 rounded-pill">Guardar Examen</button>
+        <a href="{% url 'core:ExamenSolicitado_list' %}" class="btn btn-outline-secondary w-100 rounded-pill">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

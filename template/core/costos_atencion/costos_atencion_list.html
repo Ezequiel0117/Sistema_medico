@@ -1,0 +1,78 @@
+{% extends "components/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Lista de Costos de Atención</h1>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{% url 'core:CostosAtencion_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Agregar Costo de Atención
+        </a>
+        <a href="{% url 'core:costos_atencion_detalle_list' %}" class="btn btn-secondary">
+            <i class="fas fa-info-circle me-2"></i>Detalles de Costos
+        </a>
+    </div>
+
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                <th class="w-25">Atención</th>
+                <th class="w-25">Servicios Adicionales</th>
+                <th class="w-10">Total</th>
+                <th class="w-15">Fecha de Registro</th>
+                <th class="w-10">Activo</th>
+                <th class="w-15">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for costo in costos_atencion %}
+                <tr>
+                    <td class="text-center">{{ costo.atencion|truncatechars:50 }}</td>
+                    <td>
+                        {% for servicio in costo.servicios_adicionales.all %}
+                            <span>{{ servicio.nombre_servicio }}</span><br>
+                        {% endfor %}
+                    </td>
+                    <td class="text-center">{{ costo.total }}</td>
+                    <td class="text-center">{{ costo.fecha_registro|date:"d-m-Y H:i" }}</td>
+                    <td class="text-center">{{ costo.activo|yesno:"Sí,No" }}</td>
+                    <td class="text-center">
+                        <a href="{% url 'core:CostosAtencion_edit' costo.pk %}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ costo.pk }}">
+                            <i class="fas fa-trash-alt"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>
+
+                <!-- Modal de Confirmación de Eliminación -->
+                <div class="modal fade" id="confirmDeleteModal{{ costo.pk }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel{{ costo.pk }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmDeleteModalLabel{{ costo.pk }}">Confirmar Eliminación</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>¿Estás seguro de que deseas eliminar este costo?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <form method="post" action="{% url 'core:CostosAtencion_eliminar' costo.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </form>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No hay costos de atención disponibles</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

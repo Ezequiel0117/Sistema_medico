@@ -1,0 +1,48 @@
+{% extends "components/base.html" %}
+{% block content %}
+
+<main class="container">
+    <div class="row">
+        <div class="col-md-4 offset-md-4 mt-5">
+            <form method="POST" class="card card-body text-center" style="color: black;">
+                <h1 class="text-center">Signup</h1>
+              
+                <!-- Mostrar los errores -->
+                {% if error %}
+                    <div class="alert alert-danger">
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                <!-- Token CSRF para protección -->
+                {% csrf_token %} 
+
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username:</label>
+                    <input type="text" name="username" id="username" class="form-control" placeholder="Write your username" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password1" class="form-label">Password:</label>
+                    <input type="password" name="password1" id="password1" class="form-control" placeholder="Write your password" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password2" class="form-label">Confirm your password:</label>
+                    <input type="password" name="password2" id="password2" class="form-control" placeholder="Confirm your password" required>
+                </div>
+              
+                <button class="btn btn-primary" type="submit">
+                    Signup
+                </button>
+            </form>
+
+            <!-- Botón de Signin -->
+            <div class="mt-3 text-center">
+                <p>Already have an account? <a href="{% url 'core:signin' %}" class="btn btn-link">Sign In</a></p>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

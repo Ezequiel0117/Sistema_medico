@@ -1,0 +1,81 @@
+{% extends "components/base.html" %}
+
+{% block content %}
+<!-- citas_por_dia.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citas por Día</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Citas Médicas por Día</h1>
+    
+    <!-- Tabla de citas por día -->
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Cantidad de Citas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cita in citas_por_dia %}
+            <tr>
+                <td>{{ cita.fecha }}</td>
+                <td>{{ cita.cantidad }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Canvas para el gráfico -->
+    <canvas id="citasChart" width="400" height="200"></canvas>
+
+</body>
+{% block js %}
+    <script>
+        // Pasar las fechas y cantidades al código JavaScript
+        const fechas = {{ fechas|safe }};
+        const cantidades = {{ cantidades|safe }};
+        
+        // Crear el gráfico
+        const ctx = document.getElementById('citasChart').getContext('2d');
+        const citasChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: fechas,  // Fechas
+                datasets: [{
+                    label: 'Cantidad de Citas',
+                    data: cantidades,  // Cantidades
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Fecha'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Cantidad de Citas'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}
+</html>
+
+{% endblock %}
